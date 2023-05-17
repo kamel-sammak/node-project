@@ -1,5 +1,6 @@
-const Doctors = requestuire("../models/doctorModel.js.js");
-
+const express = require("express");
+const Doctors = require("../models/doctorModel");
+const app = express();
 module.exports = function (app) {
     
   app.post("/doctors", async (request, response) => {

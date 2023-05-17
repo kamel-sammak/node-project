@@ -1,4 +1,6 @@
 const Patients = requestuire("../models/patientsModel.js");
+const express = require("express");
+const app = express();
 
 module.exports = function (app) {
     
