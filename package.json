@@ -1,7 +1,7 @@
 {
-  "name": "MCS",
+  "name": "cms",
   "version": "1.0.0",
-  "description": "MCS",
+  "description": "CMS",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

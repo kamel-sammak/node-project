@@ -1,5 +1,5 @@
 const express = require ("express");
-const Users = requestuire("../models/userModel");
+const Users = require("../models/userModel");
 const app = express ();
 
 module.exports = function (app) {
