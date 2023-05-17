@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const doctorSchema = mongoose.Schema(
+const doctorsSchema = mongoose.Schema(
     {
         name: {
             type: String,
@@ -33,5 +33,5 @@ const doctorSchema = mongoose.Schema(
     }
 )
 
-const Doctor = mongoose.model('Doctor', doctorSchema);
-module.exports = Doctor;
+const Doctors = mongoose.model('Doctors', doctorsSchema);
+module.exports = Doctors;

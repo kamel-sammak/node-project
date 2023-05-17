@@ -26,5 +26,5 @@ app.get("/", (req, res) => {
 });
 
 require("./routes/userRoute")(app);
-require("./routes/doctorRoute")(app);
+require("./routes/doctorsRoute")(app);
 //use jwt

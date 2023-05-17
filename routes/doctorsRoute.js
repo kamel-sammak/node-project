@@ -1,6 +1,7 @@
-const express = require("express");
-const Doctors = require("../models/doctorModel");
+const Doctors = require("../models/doctorsModel");
+const express = require("express")
 const app = express();
+
 module.exports = function (app) {
     
   app.post("/doctors", async (request, response) => {
