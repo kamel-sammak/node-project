@@ -31,11 +31,13 @@ const userRoute = require('./routes/userRoute');
 const doctorRoute = require('./routes/doctorRoute');
 const patientRoute = require('./routes/patientRoute');
 const appointmentRoute = require('./routes/appointmentRoute');
+const departmentRoute = require ('./routes/departmentRoute');
 
 app.use('/api/users', userRoute);
 app.use('/api/doctors', doctorRoute);
 app.use('/api/patients', patientRoute);
 app.use('/api/appointments', appointmentRoute);
+app.use('/api/department',departmentRoute);
 
 //add cors validate
 const whitelist = ["http://localhost:3000"]

@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
 const patientSchema = mongoose.Schema(
     {
-        name: {
+        firstName: {
             type: String,
-            required: [true , "please enter user name !"]
+            required: [true, "please enter user name !"]
+        },
+        lastName: {
+            type: String,
+            required: [true, "please enter user name !"]
         },
         age: {
             type: Number,

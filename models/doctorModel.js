@@ -17,6 +17,16 @@ const doctorSchema = mongoose.Schema(
             type: Number,
             required: [true, "please enter age !"]
         },
+        contact:{
+            email:{
+                type: String,
+                required: [true , "please enter email !"]
+            },
+            phone:{
+                type: Number,
+                required: [true , "please enter phone !"]
+            }
+        }
     },
     {
         timestamps: true
