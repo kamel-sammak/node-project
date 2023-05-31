@@ -23,7 +23,7 @@ const doctorSchema = mongoose.Schema(
                 required: [true , "please enter email !"]
             },
             phone:{
-                type: Number,
+                type: String,
                 required: [true , "please enter phone !"]
             }
         }
