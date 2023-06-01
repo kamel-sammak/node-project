@@ -17,9 +17,9 @@ const AppointmentSchema = mongoose.Schema(
         },    
     },
     
-    {
-        timestamps: true
-    }
+    //{
+    //    timestamps: true
+    //}
 )
 
 const Appointment = mongoose.model('Appointment' , AppointmentSchema);

@@ -9,16 +9,16 @@ const departmentsSchema = mongoose.Schema(
             type: String,
             required: [true , "please enter description !"]
         },
-        doctor: {
+        doctor: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'doctor',
             required: [true , "please enter doctor !"]
-        },
+        }],
     },
 
-    {
-        timestamps: true
-    }
+    //{
+    //    timestamps: true
+    //}
 )
 
 const Departments = mongoose.model('Departments', departmentsSchema);

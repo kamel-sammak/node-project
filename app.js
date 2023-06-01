@@ -27,18 +27,14 @@ app.get("/", (req, res) => {
 
 // require("./routes/userRoute")(app);
 
-const userRoute = require('./routes/userRoute');
 const doctorRoute = require('./routes/doctorRoute');
-const patientRoute = require('./routes/patientRoute');
-const appointmentRoute = require('./routes/appointmentRoute');
-const departmentRoute = require ('./routes/departmentRoute');
+const receptionRoute = require( './routes/receptionRoute');
+const adminRoute = require( './routes/adminRoute');
 
-app.use('/api/users', userRoute);
+
 app.use('/api/doctors', doctorRoute);
-app.use('/api/patients', patientRoute);
-app.use('/api/appointments', appointmentRoute);
-app.use('/api/department',departmentRoute);
-
+app.use('/api/receptions',receptionRoute);
+app.use('/api/admin', adminRoute);
 //add cors validate
 const whitelist = ["http://localhost:3000"]
 const corsOptions = {

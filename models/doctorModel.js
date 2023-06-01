@@ -1,9 +1,17 @@
 const mongoose = require('mongoose');
 const doctorSchema = mongoose.Schema(
     {
-        name: {
+        firstName: {
             type: String,
-            required: [true, "please enter user name !"]
+            required: [true , "please enter user firstName !"]
+        },
+        lastName: {
+            type: String,
+            required: [true , "please enter user lastName !"]
+        },
+        doctorName: {
+            type: String,
+            required: [true , "please enter user doctorName !"]
         },
         specialty: {
             type: String,
@@ -17,20 +25,28 @@ const doctorSchema = mongoose.Schema(
             type: Number,
             required: [true, "please enter age !"]
         },
-        contact:{
-            email:{
+        email:{
                 type: String,
                 required: [true , "please enter email !"]
             },
-            phone:{
+        password:{
+                type: String,
+                required: [true , "please enter password !"]
+            },
+        phones:[{
                 type: String,
                 required: [true , "please enter phone !"]
-            }
-        }
+            }],
+        location:{
+                type: String,
+                required: [true , "please enter location !"]
+            }    
+        
     },
-    {
-        timestamps: true
-    }
+    
+    //{
+    //    timestamps: true
+    //}
 )
 
 const Doctor = mongoose.model('Doctor', doctorSchema);

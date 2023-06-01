@@ -3,16 +3,23 @@ const Doctor = require("../models/doctorModel");
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.post("/loginasDoctor", async (request, response) => {
   try {
-    const doctors = await Doctor.find({});
-    res.status(200).json(doctors);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const { email, password } = request.body;
+    const doctor = await Doctor.findOne({ email });
+    var isMatch = false;
+    if (doctor) isMatch = await (password === doctor.password);
+    if (!doctor || !isMatch)
+      return response
+        .status(400)
+        .json({ error: "Invalid USERNAME or PASSWORD" });
+    if (doctor && isMatch) return response.status(200).json({message:"success"});
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).json({ message: error.message });
   }
 });
-
-router.get("/:id", async (req, res) => {
+router.get("/getMyInfo/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const doctor = await Doctor.findById(id);
@@ -23,16 +30,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  try {
-    const doctor = await Doctor.create(req.body);
-    res.status(200).json(doctor);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-router.put("/:id", async (req, res) => {
+router.put("/editDoctorInfo/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const doctor = await Doctor.findByIdAndUpdate(id, req.body);
@@ -42,18 +40,6 @@ router.put("/:id", async (req, res) => {
       const newDoctor = await Doctor.findById(id);
       res.status(200).json(newDoctor);
     }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-router.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const doctor = await Doctor.findByIdAndDelete(id);
-    if (!doctor)
-      res.status(404).json({ message: `cannot find doctor with id ${id} !` });
-    else res.status(200).json({ message: "doctor delete from doctors" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
