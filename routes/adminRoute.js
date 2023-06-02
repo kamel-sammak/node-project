@@ -3,6 +3,7 @@ const Reception=require("../models/receptionModel.js")
 const router = express.Router();
 const Doctor = require("../models/doctorModel");
 const Department = require("../models/departmentModel");
+const Appointment = require("../models/appointmentModel");
 const mongoose = require('mongoose');
 
 
@@ -129,6 +130,18 @@ router.get("/getReception_info/:id", async (request, response) => {
       res.status(500).json({ message: error.message });
     }
   });
+
+  
+router.get("/doctor_appoitment/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointments = await Appointment.find({ doctor: id });
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
   
 
 
