@@ -18,7 +18,7 @@ const Doctor = require("../models/doctorModel.js");
               return response
                 .status(400)
                 .json({ error: "Invalid USERNAME or PASSWORD" });
-            if (reception && isMatch) return response.status(200).json({ message: "success" });
+            if (reception && isMatch) return response.status(200).json({ message: "success login reception " });
           }
       
           if (email) {
@@ -29,7 +29,7 @@ const Doctor = require("../models/doctorModel.js");
               return response
                 .status(400)
                 .json({ error: "Invalid USERNAME or PASSWORD" });
-            if (doctor && isMatch) return response.status(200).json({ message: "success" });
+            if (doctor && isMatch) return response.status(200).json({ message: "success login doctor" });
           }
       
           // If neither receptionEmail nor email is present in the request body
