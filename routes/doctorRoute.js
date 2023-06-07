@@ -4,22 +4,7 @@ const Appointment = require("../models/appointmentModel");
 const Patient = require("../models/patientModel");
 const router = express.Router();
 
-router.post("/loginasDoctor", async (request, response) => {
-  try {
-    const { email, password } = request.body;
-    const doctor = await Doctor.findOne({ email });
-    var isMatch = false;
-    if (doctor) isMatch = await (password === doctor.password);
-    if (!doctor || !isMatch)
-      return response
-        .status(400)
-        .json({ error: "Invalid USERNAME or PASSWORD" });
-    if (doctor && isMatch) return response.status(200).json({message:"success"});
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).json({ message: error.message });
-  }
-});
+
 router.get("/getMyInfo/:id", async (req, res) => {
   try {
     const { id } = req.params;
