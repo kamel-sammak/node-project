@@ -8,22 +8,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 
-router.post("/loginasReception",  async (request, response) => {
-  try {
-    const { receptionEmail, password } = request.body;
-    const reception = await Reception.findOne({ receptionEmail });
-    var isMatch = false;
-    if (reception) isMatch = await (password === reception.password);
-    if (!reception || !isMatch)
-      return response
-        .status(400)
-        .json({ error: "Invalid USERNAME or PASSWORD" });
-    if (reception && isMatch) return response.status(200).json({message:"success"});
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).json({ message: error.message });
-  }
-});
+
  
 router.get("/getReception_info/:id", async (request, response) => {
   try {
