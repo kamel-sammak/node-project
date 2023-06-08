@@ -18,15 +18,6 @@ router.post("/addAdmin", async (request, response) => {
   }
 });
 
-router.get("/get_allAdmin", async (request, response) => {
-  try {
-    const admin = await Admin.find({}).select('firstName lastName email gender age phones location');
-    response.status(200).json(admin);
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).json({ message: error.message });
-  }
-});
 
 router.post("/addReception", async (request, response) => {
     try {
