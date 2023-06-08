@@ -32,7 +32,7 @@ const receptionRoute = require( './routes/receptionRoute');
 const adminRoute = require( './routes/adminRoute');
 const loginRoute = require('./routes/loginRoute');
 
-app.use('/api/login',loginRoute);
+app.use('/api',loginRoute);
 app.use('/api/doctors', doctorRoute);
 app.use('/api/receptions',receptionRoute);
 app.use('/api/admin', adminRoute);

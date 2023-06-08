@@ -4,6 +4,7 @@ const router = express.Router();
 const Doctor = require("../models/doctorModel");
 const Department = require("../models/departmentModel");
 const Appointment = require("../models/appointmentModel");
+const Admin = require("../models/adminModel.js");
 const mongoose = require('mongoose');
 
 
@@ -20,7 +21,7 @@ router.post("/addReception", async (request, response) => {
     
   router.get("/get_allReception", async (request, response) => {
     try {
-      const reception = await Reception.find({}).select('receptionName receptionEmail location');
+      const reception = await Reception.find({}).select('receptionName email location');
       response.status(200).json(reception);
     } catch (error) {
       console.log(error.message);
@@ -32,7 +33,7 @@ router.post("/addReception", async (request, response) => {
 router.get("/getReception_info/:id", async (request, response) => {
     try {
       const { id } = request.params;
-      const reception = await Reception.findById(id);
+      const reception = await Reception.findById(id).select('receptionName email location');
       response.status(200).json(reception);
     } catch (error) {
       console.log(error.message);
@@ -43,13 +44,13 @@ router.get("/getReception_info/:id", async (request, response) => {
   router.put("/editReception_info/:id", async (request, response) => {
     try {
       const { id } = request.params;
-      const reception = await Reception.findByIdAndUpdate(id, request.body);
+      const reception = await Reception.findByIdAndUpdate(id, request.body).select('receptionName email location');
       if (!reception)
         response
           .status(404)
           .json({ message: `cannot find user with id ${id} !` });
       else {
-        const newreception = await Reception.findById(id);
+        const newreception = await Reception.findById(id).select('receptionName email location');
         response.status(200).json(newreception);
       }
     } catch (error) {
@@ -198,6 +199,15 @@ router.get("/doctor_appoitment/:id", async (req, res) => {
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  });
+  router.post("/addAdmin", async (request, response) => {
+    try {
+      const admin = await Admin.create(request.body);
+      response.status(200).json(admin);
+    } catch (error) {
+      console.log(error.message);
+      response.status(500).json({ message: error.message });
     }
   });
 

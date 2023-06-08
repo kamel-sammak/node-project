@@ -13,7 +13,7 @@ const receptionSchema = mongoose.Schema(
             type: String,
             required: [true , "please enter receptionName !"]
         },
-        receptionEmail: {
+        email: {
             type: String,
             required: [true , "please enter receptionEmail !"]
         },
