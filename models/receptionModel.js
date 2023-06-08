@@ -29,14 +29,15 @@ const receptionSchema = mongoose.Schema(
             type: String,
             required: [true , "please enter location !"]
         },
-        birthDate: {
+        age: {
             type: String,
             required: [true , "please enter birthDate !"]
         },
-        role: {
+        gender: {
             type: String,
-            required: [true , "please enter role !"]
-        },
+            required: [true, "please enter gender !"]
+        }
+        
     },
     //{
     //    timestamps: true

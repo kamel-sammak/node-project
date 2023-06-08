@@ -8,6 +8,25 @@ const Admin = require("../models/adminModel.js");
 const mongoose = require('mongoose');
 
 
+router.post("/addAdmin", async (request, response) => {
+  try {
+    const admin = await Admin.create(request.body);
+    response.status(200).json(admin);
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/get_allAdmin", async (request, response) => {
+  try {
+    const admin = await Admin.find({}).select('firstName lastName email gender age phones location');
+    response.status(200).json(admin);
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).json({ message: error.message });
+  }
+});
 
 router.post("/addReception", async (request, response) => {
     try {
@@ -21,7 +40,7 @@ router.post("/addReception", async (request, response) => {
     
   router.get("/get_allReception", async (request, response) => {
     try {
-      const reception = await Reception.find({}).select('receptionName email location');
+      const reception = await Reception.find({}).select('firstName lastName receptionName email phones location age gender');
       response.status(200).json(reception);
     } catch (error) {
       console.log(error.message);
@@ -33,7 +52,7 @@ router.post("/addReception", async (request, response) => {
 router.get("/getReception_info/:id", async (request, response) => {
     try {
       const { id } = request.params;
-      const reception = await Reception.findById(id).select('receptionName email location');
+      const reception = await Reception.findById(id).select('firstName lastName receptionName email phones location age gender');
       response.status(200).json(reception);
     } catch (error) {
       console.log(error.message);
@@ -44,13 +63,13 @@ router.get("/getReception_info/:id", async (request, response) => {
   router.put("/editReception_info/:id", async (request, response) => {
     try {
       const { id } = request.params;
-      const reception = await Reception.findByIdAndUpdate(id, request.body).select('receptionName email location');
+      const reception = await Reception.findByIdAndUpdate(id, request.body);
       if (!reception)
         response
           .status(404)
           .json({ message: `cannot find user with id ${id} !` });
       else {
-        const newreception = await Reception.findById(id).select('receptionName email location');
+        const newreception = await Reception.findById(id);
         response.status(200).json(newreception);
       }
     } catch (error) {
@@ -78,7 +97,7 @@ router.get("/getReception_info/:id", async (request, response) => {
 
   router.get("/getAlldoctors", async (req, res) => {
     try {
-      const doctors = await Doctor.find({}).select('doctorName specialty email');
+      const doctors = await Doctor.find({}).select('firstName lastName doctorName specialty gender age email phones location');
       res.status(200).json(doctors);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -88,7 +107,7 @@ router.get("/getReception_info/:id", async (request, response) => {
   router.get("/getDoctor_info/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const doctor = await Doctor.findById(id);
+      const doctor = await Doctor.findById(id).select('firstName lastName doctorName specialty gender age email phones location');
       if (doctor) res.status(200).json(doctor);
       else res.status(404).json({ message: "can't find doctor" });
     } catch (error) {
@@ -142,8 +161,6 @@ router.get("/doctor_appoitment/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-  
 
 
   router.get("/getallDeapartments", (req, res) => {
@@ -201,14 +218,6 @@ router.get("/doctor_appoitment/:id", async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   });
-  router.post("/addAdmin", async (request, response) => {
-    try {
-      const admin = await Admin.create(request.body);
-      response.status(200).json(admin);
-    } catch (error) {
-      console.log(error.message);
-      response.status(500).json({ message: error.message });
-    }
-  });
+  
 
   module.exports = router;
