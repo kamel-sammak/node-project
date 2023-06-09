@@ -11,19 +11,19 @@ router.post("/login", async (request, response) => {
     // Check if the user is an admin
     const admin = await Admin.findOne({ email, password });
     if (admin) {
-      return response.status(200).json({ role: "admin", message: "Admin login successful" });
+      return response.status(200).json({ role: "admin", message: "Admin login successful", id: admin._id });
     }
 
     // Check if the user is a receptionist
     const reception = await Reception.findOne({ email, password });
     if (reception) {
-      return response.status(200).json({ role: "reception", message: "Reception login successful" });
+      return response.status(200).json({ role: "reception", message: "Reception login successful", id: reception._id });
     }
 
     // Check if the user is a doctor
     const doctor = await Doctor.findOne({ email, password });
     if (doctor) {
-      return response.status(200).json({ role: "doctor", message: "Doctor login successful" });
+      return response.status(200).json({ role: "doctor", message: "Doctor login successful", id: doctor._id });
     }
 
     // If no matching user is found
