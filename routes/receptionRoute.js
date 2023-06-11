@@ -2,8 +2,7 @@ const express = require("express");
 const Reception=require("../models/receptionModel.js")
 const Patient = require("../models/patientModel");
 const Appointment = require("../models/appointmentModel");
-const mongoose = require('mongoose');
-
+const Doctor = require("../models/doctorModel.js");
 
 const router = express.Router();
 
@@ -93,19 +92,27 @@ router.delete("/deletePatient/:id", async (req, res) => {
 
 
 
-router.post("/addappointment/:id", async(req, res) => {
-  const { date,doctor } = req.body;
- 
-  if (!mongoose.Types.ObjectId.isValid(doctor)) {
-    return res.status(400).json({ error: "Invalid doctor ID" });
+router.post("/addappointment", async (req, res) => {
+  const { date, doctorName, patientName } = req.body;
+
+  const foundDoctor = await Doctor.findOne({ doctorName });
+
+  if (!foundDoctor) {
+    return res.status(404).json({ error: "Doctor not found" });
   }
-  const { id } = req.params;
-    const patient = await Patient.findById(id);
+
+  const foundPatient = await Patient.findOne({ patientName });
+
+  if (!foundPatient) {
+    return res.status(404).json({ error: "Patient not found" });
+  }
+
   const newAppointment = new Appointment({
     date,
-    doctor: new mongoose.Types.ObjectId(doctor),
-    patient: patient
+    doctor: foundDoctor.doctorName,
+    patient: foundPatient.patientName,
   });
+
   newAppointment
     .save()
     .then((appointment) => res.json(appointment))
@@ -114,6 +121,10 @@ router.post("/addappointment/:id", async(req, res) => {
       res.status(500).json({ error: "Could not create appointment" });
     });
 });
+
+
+
+
 router.delete("/deleteAppointment/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -128,17 +139,25 @@ router.delete("/deleteAppointment/:id", async (req, res) => {
 router.put("/editappointment/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const newAppointment = await Appointment.findByIdAndUpdate(id, req.body);
-    if (!newAppointment)
-      res.status(404).json({ message: `cannot find Patient with id ${id} !` });
-    else {
-      const newAppointment = await Appointment.findById(id);
-      res.status(200).json(newAppointment);
+    const { patientName, doctorName } = req.body;
+
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      id,
+      { patient: patientName, doctor: doctorName },
+      { new: true }
+    );
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ message: `Cannot find appointment with id ${id}` });
     }
+
+    res.status(200).json(updatedAppointment);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+    res.status(500).json({ error: "Could not update appointment" });
   }
 });
+
 router.get("/getAllAppointment", (req, res) => {
   Appointment.find()
     .then((appointments) => res.json(appointments))

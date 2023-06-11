@@ -2,25 +2,23 @@ const mongoose = require('mongoose');
 const AppointmentSchema = mongoose.Schema(
     {
         date: {
+            type: Date,
+            required: [true, "Please enter the appointment date"],
+          },
+          doctor: {
             type: String,
-            required: [true , "please enter date !"]
-        },
-        doctor: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'doctor',
-            required: [true , "please enter doctor !"]
-        },
-        patient: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'patient',
-            required: [true , "please enter user patient !"]
-        },    
-    },
+            required: [true, "Please enter the doctor's name"],
+          },
+          patient: {
+            type: String,
+            required: [true, "Please enter the patient ID"],
+          },
+        });
     
     //{
     //    timestamps: true
     //}
-)
 
+////
 const Appointment = mongoose.model('Appointment' , AppointmentSchema);
 module.exports = Appointment; 

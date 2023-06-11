@@ -40,16 +40,20 @@ router.post("/addReception", async (request, response) => {
   });
   
   
-router.get("/getReception_info/:id", async (request, response) => {
+  router.get("/getReception_info/:receptionName", async (request, response) => {
     try {
-      const { id } = request.params;
-      const reception = await Reception.findById(id).select('firstName lastName receptionName email phones location age gender');
+      const { receptionName } = request.params;
+      const reception = await Reception.findOne({ receptionName }).select('firstName lastName receptionName email phones location age gender');
+      if (!reception) {
+        return response.status(404).json({ message: "Reception not found" });
+      }
       response.status(200).json(reception);
     } catch (error) {
       console.log(error.message);
       response.status(500).json({ message: error.message });
     }
   });
+  
   
   router.put("/editReception_info/:id", async (request, response) => {
     try {
@@ -143,46 +147,73 @@ router.get("/getReception_info/:id", async (request, response) => {
   });
 
   
-router.get("/doctor_appoitment/:id", async (req, res) => {
+  router.get("/doctor_appointment/:name", async (req, res) => {
+    try {
+      const { name } = req.params;
+      const appointments = await Appointment.find({ doctorName: name });
+  
+      if (appointments.length === 0) {
+        return res.status(404).json({ message: "No appointments found for the given doctor name" });
+      }
+  
+      res.status(200).json(appointments);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  
+
+
+router.get("/getallDepartments", async (req, res) => {
   try {
-    const { id } = req.params;
-    const appointments = await Appointment.find({ doctor: id });
-    res.status(200).json(appointments);
+    const departments = await Department.find();
+    const departmentsWithDoctorName = await Promise.all(
+      departments.map(async (department) => {
+        const doctor = await Doctor.findOne({ doctorName: department.doctor });
+        return {
+          _id: department._id,
+          section: department.section,
+          description: department.description,
+          doctorName: doctor ? doctor.doctorName : 'Unknown',
+        };
+      })
+    );
+    res.json(departmentsWithDoctorName);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+    res.status(500).json({ error: "Could not retrieve departments" });
   }
 });
 
 
-  router.get("/getallDeapartments", (req, res) => {
-    Department.find()
-      .then((department) => res.json(department))
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({ error: "Could not retrieve department" });
-      });
-  });
-  
-  router.post("/addDepartments", (req, res) => {
-    const { section,description, doctor } = req.body;
-    
-    if (!mongoose.Types.ObjectId.isValid(doctor)) {
-      return res.status(400).json({ error: "Invalid doctor ID" });
-    }
-    const newDepartment = new Department({
-      section,      
-      description,
-      doctor: new mongoose.Types.ObjectId(doctor)
 
-    });
-    newDepartment
-      .save()
-      .then((department) => res.json(department))
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({ error: "Could not create department" });
-      });
+
+  
+router.post("/addDepartments", async (req, res) => {
+  const { section, description, doctorName } = req.body;
+
+  const foundDoctor = await Doctor.findOne({ doctorName });
+
+  if (!foundDoctor) {
+    return res.status(404).json({ error: "Doctor not found" });
+  }
+
+  const newDepartment = new Department({
+    section,
+    description,
+    doctor: foundDoctor.doctorName, // Use the doctorName field
   });
+
+  newDepartment
+    .save()
+    .then((department) => res.json(department))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: "Could not create department" });
+    });
+});
+
   router.delete("/deletedepartment/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -195,20 +226,30 @@ router.get("/doctor_appoitment/:id", async (req, res) => {
     }
   });
 
-   router.put("/editdepartment/:id", async (req, res) => {
+  router.put("/editdepartment/:section", async (req, res) => {
     try {
-      const { id } = req.params;
-      const department = await Department.findByIdAndUpdate(id, req.body);
-      if (!department)
-        res.status(404).json({ message: `cannot find doctor with id ${id} !` });
-      else {
-        const newDepartment = await Department.findById(id);
-        res.status(200).json(newDepartment);
+      const { section } = req.params;
+      const { description, doctorName } = req.body;
+  
+      // Find the department by section
+      const updatedDepartment = await Department.findOne({ section });
+  
+      if (!updatedDepartment) {
+        return res.status(404).json({ message: `Department with section ${section} not found` });
       }
+  
+      // Update the department's description and doctor
+      updatedDepartment.description = description;
+      updatedDepartment.doctor = doctorName;
+  
+      // Save the updated department
+      const savedDepartment = await updatedDepartment.save();
+  
+      res.status(200).json(savedDepartment);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
   
-
+  
   module.exports = router;

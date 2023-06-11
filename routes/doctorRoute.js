@@ -32,19 +32,26 @@ router.put("/editDoctorInfo/:id", async (req, res) => {
   }
 });
 
-router.get("/doctor_appoitment/:id", async (req, res) => {
+router.get("/doctor_appointment/:name", async (req, res) => {
   try {
-    const { id } = req.params;
-    const appointments = await Appointment.find({ doctor: id });
+    const { name } = req.params;
+    const appointments = await Appointment.find({ doctorName: name });
+
+    if (appointments.length === 0) {
+      return res.status(404).json({ message: "No appointments found for the given doctor name" });
+    }
+
     res.status(200).json(appointments);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
-router.get("/view_patient_details/:id", async (req, res) => {
+
+
+router.get("/view_patient_details/:patientName", async (req, res) => {
   try {
-    const { id } = req.params;
-    const appointment = await Appointment.findById(id);
+    const { patientName } = req.params;
+    const appointment = await Appointment.find({patientName});
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
@@ -57,19 +64,28 @@ router.get("/view_patient_details/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-router.put("/editPatientDetails/:id", async (req, res) => {
+
+router.put("/editPatientDetails/:patientName", async (req, res) => {
   try {
-    const { id } = req.params;
-    const patient = await Patient.findByIdAndUpdate(id, req.body);
-    if (!patient)
-      res.status(404).json({ message: `cannot find doctor with id ${id} !` });
-    else {
-      const newPatient = await Patient.findById(id);
-      res.status(200).json(newPatient);
+    const { patientName } = req.params;
+    const { diagnosis, required_medications } = req.body;
+
+    const updatedPatient = await Patient.findOne({ patientName });
+
+    
+    if (!Patient)
+      res.status(404).json({ message: `cannot find doctor with patientName ${patientName} !` });
+
+      updatedPatient.diagnosis = diagnosis;
+      updatedPatient.required_medications = required_medications;
+
+      const savedPatient = await updatedPatient.save();
+
+      res.status(200).json(savedPatient);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+   
 });
 
 
