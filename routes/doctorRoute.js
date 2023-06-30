@@ -32,13 +32,17 @@ router.put("/editDoctorInfo/:id", async (req, res) => {
   }
 });
 
-router.get("/doctor_appointment/:name", async (req, res) => {
+router.get('/doctor_appointment/:doctorId', async (req, res) => {
   try {
-    const { name } = req.params;
-    const appointments = await Appointment.find({ doctorName: name });
+    const { doctorId } = req.params;
+
+    // Find the appointments for the given doctor ID and populate doctor and patient fields
+    const appointments = await Appointment.find({ doctor: doctorId })
+      .populate('doctor', 'doctorName')
+      .populate('patient', 'patientName');
 
     if (appointments.length === 0) {
-      return res.status(404).json({ message: "No appointments found for the given doctor name" });
+      return res.status(404).json({ message: 'No appointments found for the given doctor ID' });
     }
 
     res.status(200).json(appointments);
@@ -48,45 +52,55 @@ router.get("/doctor_appointment/:name", async (req, res) => {
 });
 
 
-router.get("/view_patient_details/:patientName", async (req, res) => {
+
+
+
+router.get("/view_patient_details/:patientId", async (req, res) => {
   try {
-    const { patientName } = req.params;
-    const appointment = await Appointment.find({patientName});
+    const { patientId } = req.params;
+
+    const appointment = await Appointment.findOne({ patient: patientId });
+
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
+
     const patient = await Patient.findById(appointment.patient);
+
     if (!patient) {
       return res.status(404).json({ message: "Patient not found" });
     }
+
     res.status(200).json(patient);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-router.put("/editPatientDetails/:patientName", async (req, res) => {
+
+
+router.put("/editPatientDetails/:id", async (req, res) => {
   try {
-    const { patientName } = req.params;
+    const { id } = req.params;
     const { diagnosis, required_medications } = req.body;
 
-    const updatedPatient = await Patient.findOne({ patientName });
+    const updatedPatient = await Patient.findById(id);
 
-    
-    if (!Patient)
-      res.status(404).json({ message: `cannot find doctor with patientName ${patientName} !` });
-
-      updatedPatient.diagnosis = diagnosis;
-      updatedPatient.required_medications = required_medications;
-
-      const savedPatient = await updatedPatient.save();
-
-      res.status(200).json(savedPatient);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    if (!updatedPatient) {
+      return res.status(404).json({ message: `Cannot find patient with ID ${id}` });
     }
-   
+
+    updatedPatient.diagnosis = diagnosis;
+    updatedPatient.required_medications = required_medications;
+
+    const savedPatient = await updatedPatient.save();
+
+    res.status(200).json(savedPatient);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
+
 
 
 module.exports = router;

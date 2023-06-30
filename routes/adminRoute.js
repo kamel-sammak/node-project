@@ -10,13 +10,21 @@ const mongoose = require('mongoose');
 
 router.post("/addAdmin", async (request, response) => {
   try {
-    const admin = await Admin.create(request.body);
+    const { email, password, doctorName } = request.body;
+
+    const admin = await Admin.create({
+      email,
+      password,
+      doctorName,
+    });
+
     response.status(200).json(admin);
   } catch (error) {
     console.log(error.message);
     response.status(500).json({ message: error.message });
   }
 });
+
 
 
 router.post("/addReception", async (request, response) => {
@@ -147,16 +155,37 @@ router.post("/addReception", async (request, response) => {
   });
 
   
-  router.get("/doctor_appointment/:name", async (req, res) => {
+  router.get('/doctor_appointment/:doctorId', async (req, res) => {
     try {
-      const { name } = req.params;
-      const appointments = await Appointment.find({ doctorName: name });
+      const { doctorId } = req.params;
   
-      if (appointments.length === 0) {
-        return res.status(404).json({ message: "No appointments found for the given doctor name" });
+      // Find the doctor by ID
+      const doctor = await Doctor.findById(doctorId);
+  
+      if (!doctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
       }
   
-      res.status(200).json(appointments);
+      // Find the appointments for the given doctor ID and populate doctor and patient fields with patientName
+      const appointments = await Appointment.find({ doctor: doctorId })
+        .populate({ path: 'patient', select: 'patientName' });
+  
+      const formattedAppointments = appointments.map(appointment => {
+        return {
+          id: appointment._id,
+          date: appointment.date,
+          doctorName: appointment.doctor,
+          patientName: appointment.patient.patientName
+        };
+      });
+  
+      const doctorWithAppointments = {
+        id: doctor._id,
+        doctorName: doctor.doctorName,
+        appointments: formattedAppointments
+      };
+  
+      res.status(200).json(doctorWithAppointments);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -226,21 +255,22 @@ router.post("/addDepartments", async (req, res) => {
     }
   });
 
-  router.put("/editdepartment/:section", async (req, res) => {
+  router.put("/editdepartment/:id", async (req, res) => {
     try {
-      const { section } = req.params;
-      const { description, doctorName } = req.body;
+      const { id } = req.params;
+      const { section, description, doctorName } = req.body;
   
-      // Find the department by section
-      const updatedDepartment = await Department.findOne({ section });
+      // Find the department by ID
+      const updatedDepartment = await Department.findById(id);
   
       if (!updatedDepartment) {
-        return res.status(404).json({ message: `Department with section ${section} not found` });
+        return res.status(404).json({ message: `Department with ID ${id} not found` });
       }
   
-      // Update the department's description and doctor
+      // Update the department's section, description, and doctor name
+      updatedDepartment.section = section;
       updatedDepartment.description = description;
-      updatedDepartment.doctor = doctorName;
+      updatedDepartment.doctorName = doctorName;
   
       // Save the updated department
       const savedDepartment = await updatedDepartment.save();
@@ -250,6 +280,8 @@ router.post("/addDepartments", async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   });
+  
+  
   
   
   module.exports = router;

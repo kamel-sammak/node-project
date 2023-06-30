@@ -92,8 +92,9 @@ router.delete("/deletePatient/:id", async (req, res) => {
 
 
 
-router.post("/addappointment", async (req, res) => {
-  const { date, doctorName, patientName } = req.body;
+router.post("/addappointment/:patientId", async (req, res) => {
+  const { patientId } = req.params;
+  const { date, doctorName } = req.body;
 
   const foundDoctor = await Doctor.findOne({ doctorName });
 
@@ -101,7 +102,7 @@ router.post("/addappointment", async (req, res) => {
     return res.status(404).json({ error: "Doctor not found" });
   }
 
-  const foundPatient = await Patient.findOne({ patientName });
+  const foundPatient = await Patient.findById(patientId);
 
   if (!foundPatient) {
     return res.status(404).json({ error: "Patient not found" });
@@ -110,17 +111,28 @@ router.post("/addappointment", async (req, res) => {
   const newAppointment = new Appointment({
     date,
     doctor: foundDoctor.doctorName,
-    patient: foundPatient.patientName,
+    patient: foundPatient._id,
   });
 
   newAppointment
     .save()
-    .then((appointment) => res.json(appointment))
+    .then((appointment) => {
+      const appointmentData = {
+        id: appointment._id,
+        date: appointment.date,
+        doctorName: appointment.doctor,
+        patientName: foundPatient.patientName,
+      };
+      res.json(appointmentData);
+    })
     .catch((err) => {
       console.log(err);
       res.status(500).json({ error: "Could not create appointment" });
     });
 });
+
+
+
 
 
 
@@ -139,11 +151,11 @@ router.delete("/deleteAppointment/:id", async (req, res) => {
 router.put("/editappointment/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { patientName, doctorName } = req.body;
+    const { date } = req.body;
 
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       id,
-      { patient: patientName, doctor: doctorName },
+      { date },
       { new: true }
     );
 
@@ -158,14 +170,30 @@ router.put("/editappointment/:id", async (req, res) => {
   }
 });
 
-router.get("/getAllAppointment", (req, res) => {
-  Appointment.find()
-    .then((appointments) => res.json(appointments))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: "Could not retrieve appointments" });
+
+router.get("/getAllAppointment", async (req, res) => {
+  try {
+    const appointments = await Appointment.find()
+      .select("_id date doctor patient")
+      .populate("patient", "patientName")
+      .exec();
+
+    const formattedAppointments = appointments.map(appointment => {
+      return {
+        appointmentId: appointment._id,
+        date: appointment.date,
+        doctorName: appointment.doctor,
+        patientName: appointment.patient
+      };
     });
+
+    res.status(200).json(formattedAppointments);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Could not retrieve appointments" });
+  }
 });
+
 
 module.exports = router;
 

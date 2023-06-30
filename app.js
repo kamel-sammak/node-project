@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors")
+const cors = require("cors");
 const app = express();
 const port = 3000;
 const databaseUrl = "mongodb://127.0.0.1:27017/CMS";
@@ -8,6 +8,7 @@ const databaseUrl = "mongodb://127.0.0.1:27017/CMS";
 //use middleware
 app.use(express.json()); // this to active send data with json type
 app.use(express.urlencoded({ extended: false })); // this to active send data with form type
+app.use(cors());
 
 //connect to mongoDB and start listen on port
 mongoose
@@ -27,25 +28,31 @@ app.get("/", (req, res) => {
 
 // require("./routes/userRoute")(app);
 
-const doctorRoute = require('./routes/doctorRoute');
-const receptionRoute = require( './routes/receptionRoute');
-const adminRoute = require( './routes/adminRoute');
-const loginRoute = require('./routes/loginRoute');
+const doctorRoute = require("./routes/doctorRoute");
+const receptionRoute = require("./routes/receptionRoute");
+const adminRoute = require("./routes/adminRoute");
+const loginRoute = require("./routes/loginRoute");
 
-app.use('/api',loginRoute);
-app.use('/api/doctors', doctorRoute);
-app.use('/api/receptions',receptionRoute);
-app.use('/api/admin', adminRoute);
+app.use("/api", loginRoute);
+app.use("/api/doctors", doctorRoute);
+app.use("/api/receptions", receptionRoute);
+app.use("/api/admin", adminRoute);
 //add cors validate
-const whitelist = ["http://localhost:3000"]
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error("Not allowed by CORS"))
-    }
-  },
-  credentials: true,
-}
-app.use(cors(corsOptions))
+// const whitelist = ["http://localhost:3000"]
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     if (!origin || whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error("Not allowed by CORS"))
+//     }
+//   },
+//   credentials: true,
+// }
+// app.use(cors(corsOptions))
+
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+  })
+);
